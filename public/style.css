@@ -1,0 +1,23 @@
+div.post {
+    border: 1px solid black;
+    padding: 0px;
+    margin: 5px;
+    width: 50%;
+}
+
+div.user {
+    border: 1px solid black;
+    display: inline-block;
+    margin: 0px;
+    width: 25%;
+}
+
+div.details {
+    background-color: darkgray;
+}
+
+div.details div {
+    border: 1px solid black;
+    display: inline;
+    width: 33%
+}
