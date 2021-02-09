@@ -1,6 +1,25 @@
 const $postContainer = document.getElementById("posts")
 const $userContainer = document.getElementById("users")
+document.getElementById("login").onclick = login()
+
 spawnData()
+ 
+function login() {
+    const package = {
+        body: JSON.stringify({
+            username: document.getElementById("username").valie,
+            password: document.getElementById("password").value
+        }),
+        method: "POST",
+        headers: {
+            "Content Type": "application/json"
+        }
+    }
+    fetch("/login", package)
+        .then(res => res.json())
+        .then(res => console.log(res.body))
+        .catch(err => console.log(err))
+}
 
 function spawnData() {
     const postsHTML = loadData().posts.map( post => `
