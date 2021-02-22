@@ -25,7 +25,7 @@ app.post("/posts", (req,res)=> {
     //3.2.1. verify the post is at least 5 characters long
     if (post.text.length >= 5) {
         //3.2.2. add to posts array if valid
-        const sql = 'INSERT INTO posts (content, userid_) VALUES (?, ?);'
+        const sql = 'INSERT INTO posts (content, userid) VALUES (?, ?);'
         db.run(sql, [post.text, post.user_id])
         //3.2.3. send response 'New post successfully saved.'
         res.send({
