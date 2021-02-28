@@ -1,13 +1,37 @@
 const $postContainer = document.getElementById("posts")
 const $userContainer = document.getElementById("users")
 document.getElementById("login").onclick = login()
+document.getElementById("makePost").onsubmit = newPost()
 
 spawnData()
  
+//Challenge 2: Create new posts
+function newPost(){
+    const package = {
+        //get information from new post
+        body: JSON.stringify({
+            //not quite sure how I want to handle users yet. I considered making a "currentUserId" const in client, and working with that, but that wouldn't be too secure
+            user: null,
+            content: document.getElementById("newPost").value,
+            date: new datetime
+        }),
+        method: "POST",
+        headers: {
+            "Content Type": "application/json"
+        }
+    }
+    //send information to server.js on "/post"
+    fetch("/post", package)
+        .then(res => res.json())
+        .then(res => console.log(res.body))
+        .catch(err => console.log(err))
+}
+
+
 function login() {
     const package = {
         body: JSON.stringify({
-            username: document.getElementById("username").valie,
+            username: document.getElementById("username").value,
             password: document.getElementById("password").value
         }),
         method: "POST",
