@@ -10,12 +10,15 @@ document.getElementById("createPost")
 spawnPosts()
 //1.4 call function to spawn user elements
 spawnUsers()
+spawnPosts()
 //2.2 Define function createPost to send post to server
+let user_id
 
 function createPost(e) {
     e.preventDefault()
     const payload = {
         body: JSON.stringify({
+            user_id: user_id,
             text: document.getElementById("newPost").value
         }),
         method: "POST",
@@ -43,42 +46,72 @@ function login(e) {
     }
     fetch("/login", payload)
         .then(res => res.json())
-        .then(res => console.log(res.body))
+        .then(res => {
+            user_id = res.userid
+            console.log(res.message)
+        })
         .catch(error => console.error(error))
 }
 
 function spawnPosts() {
-    const postsHTML = loadData().posts.map( post => `
-        <div class="post">
-            <p>${post.text}</p>
-            <div class="details">
-                <div>${post.numLikes}</div>
-                <div>${post.user}</div>
-                <div>${post.datetime}</div>
+    fetch("/posts")
+        .then(res => res.json())
+        .then(posts => {
+            const postsHTML = posts.map( post => `
+            <div class="post">
+                <p>${post.content}</p>
+                <div class="details">
+                   <div>${post.user}</div>
+                   <div>${post.datetime}</div>
+                </div>
             </div>
-        </div>
-    ` ).join("")
-    $postContainer.innerHTML = postsHTML
+        ` ).join("")
+        $postContainer.innerHTML = postsHTML
+        })
+        .catch(err => console.error(err))
 }
 
 //1.2 define a function to spawn user elements
 function spawnUsers() {
-    const usersHTML = loadData().users.map( user => `
-        <div class="user">
-            <div class="details">
-                <div>${user.username}</div>
-                <div>${user.firstName}</div>
-                <div>${user.lastName}</div>
-                <div>${user.gender}</div>
-                <div>${user.age}</div>
-            </div>
-            <button>Add Friend</button>
-        </div>
-    ` ).join("")
-    $usersContainer.innerHTML = usersHTML
+    fetch("/users")
+        .then(res => res.json())
+        .then(users => {
+
+            const usersHTML = users.map( user => `
+                <div class="user">
+                    <div class="details">
+                        <div>${user.username}</div>
+                        <div>${user.name}</div>
+                    </div>
+                    <button>Add Friend</button>
+                </div>
+            ` ).join("")
+            $usersContainer.innerHTML = usersHTML
+        })
+        .catch(err => console.error(err))
 }
 
-function loadData() {
+function addFriend(e){
+    const $userdiv = e.target.parentElement
+    const friend_id = $userdiv.userid
+
+    const payload = {
+        body: JSON.stringify({
+            user_id: user_id,
+            friend_id: friend_id
+        }),
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        }
+    }
+    fetch("/friends", payload)
+        .then(res => res.json())
+        .then(res => console.log(res.body))
+        .catch(error => console.error(error))
+}
+
+/*function loadData() {
     return {
         posts: [
             {
@@ -121,4 +154,4 @@ function loadData() {
                 }
         ]
     }
-}
+}*/

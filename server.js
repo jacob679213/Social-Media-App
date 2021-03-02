@@ -19,6 +19,13 @@ app.get("/posts", (req,res) => {
     })
 })
 
+app.get("/users", (req, res) => {
+    const sql = "SELECT * FROM users"
+    db.all(sql,[],(err,rows) =>{
+        res.send(rows)
+    })
+})
+
 //3.2 define request handler for POST on /posts
 app.post("/posts", (req,res)=> {
     const post = req.body;
@@ -43,36 +50,49 @@ app.post("/posts", (req,res)=> {
 
 app.post("/login", (req, res) => {
     const user = req.body
-    let userMatch = users.find( (u) => u.username == user.username && u.password == user.password )
-    //Does userMatch exist?
-    if (userMatch) {
-        res.send({
-            message: "Successful login!",
-            userMatch
-        })
-    }
-    else {
-        if (user.username.length >= 4 && user.password.length >= 4) {
-            //save new account on server
-            const newUser = {
-                id: users.length+1,
-                username: user.username,
-                password: user.password
-            }
-            users.push(newUser)
-            console.log(users)
+    //5. retrieve all users from db
+    //6. only retrieve users with matching username
+    const sql2 = "SELECT id FROM users WHERE username = ? AND password = ?"
+    db.all(sql2, [user.username,user.password], (err, rows) => {
+        if (rows.length > 0) {
             res.send({
-                message: "Your account was successfully created.",
-                newUser
+                message: "Successful login!",
+                rows
             })
         }
         else {
-            res.status(401)
-            res.send({
-                message: "Username or password is invalid."
-            })
+            if (user.username.length >= 4 && user.password.length >= 4) {
+                //save new account on server
+                const sql = "INSERT INTO users (name, username, password) VALUES (?,?,?)"
+                db.run(sql,[user.name, user.username, user.password],(err) =>{
+                    if(err) console.error(err)
+
+                    res.send({
+                        message: "Account Created",
+                        userId: "this.lastID"
+                    })
+                })
+            }
+            else {
+                res.status(401)
+                res.send({
+                    message: "Username or password is invalid."
+                })
+            }
         }
-    }
+    })
+})
+
+app.post("/friends", (req, res) => {
+    const friendship = req.body
+    const sql = "INSERT INTO users_users (userid1, userid2) VALUE(?,?)"
+    db.run(sql,[friendship.user_id, friendship.friend_id],(err) => {
+        if (err) console.error(err)
+        res.send({
+            message: "Your account was successfully created.",
+            userId: this.lastID
+        })
+    })
 })
 
 //start server listening on port 3000
